@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تحديد المستوى التفاعلي - Phonics Fun! - الأستاذ ماجد السويهري</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #eef4f8;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            user-select: none;
+        }
+        .en-font {
+            font-family: 'Nunito', sans-serif;
+        }
+        .en-title {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .word-chip {
+            cursor: grab;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: manipulation;
+        }
+        .word-chip:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        .word-chip.active-word {
+            box-shadow: 0 0 0 3px #0284c7;
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            transform: translateY(-2px);
+        }
+        .word-chip.used-word {
+            opacity: 0.35;
+            pointer-events: none;
+            transform: scale(0.92);
+        }
+
+        /* تصميم السلة الخشبية كما في ورقة العمل */
+        .woven-basket {
+            background: linear-gradient(180deg, #d99b66 0%, #c47d44 50%, #b06933 100%);
+            border: 3px solid #8c4f20;
+            border-radius: 22px 22px 32px 32px;
+            box-shadow: inset 0 6px 12px rgba(255,255,255,0.25), 0 6px 14px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .woven-basket::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -6px;
+            right: -6px;
+            height: 16px;
+            background: linear-gradient(90deg, #b86f37, #e0a572, #b86f37);
+            border: 3px solid #8c4f20;
+            border-radius: 9999px;
+        }
+        .basket-cloth {
+            background-color: #fdf8f2;
+            border: 2px solid #e6d5c3;
+            border-radius: 14px 14px 20px 20px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+        }
+        .basket-slot {
+            height: 42px;
+            border-bottom: 2.5px solid #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #1e293b;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .basket-slot:hover {
+            background-color: #f1f5f9;
+        }
+        .basket-slot.drag-over {
+            background-color: #e0f2fe;
+            border-bottom-color: #0284c7;
+            transform: scale(1.03);
+        }
+        .basket-slot.filled {
+            background-color: #f0f9ff;
+            border-bottom-color: #0369a1;
+            color: #0369a1;
+        }
+        .basket-slot.correct-slot {
+            background-color: #dcfce7 !important;
+            border-bottom-color: #16a34a !important;
+            color: #15803d !important;
+        }
+        .basket-slot.wrong-slot {
+            background-color: #ffe4e6 !important;
+            border-bottom-color: #dc2626 !important;
+            color: #b91c1c !important;
+        }
+
+        .phonics-choice-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .phonics-choice-pill.selected-pill {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            border-color: #312e81 !important;
+            box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+            transform: translateY(-1px);
+        }
+        .phonics-choice-pill.correct-pill {
+            background-color: #16a34a !important;
+            color: #ffffff !important;
+            border-color: #14532d !important;
+        }
+        .phonics-choice-pill.wrong-pill {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            border-color: #7f1d1d !important;
+        }
+
+        .word-cloud-svg {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+        }
+        .word-cloud-svg:hover {
+            transform: translateY(-3px) scale(1.03);
+        }
+        .cloud-shape {
+            fill: #ffffff;
+            stroke: #334155;
+            stroke-width: 3;
+            transition: fill 0.3s ease, stroke 0.3s ease;
+        }
+        .cloud-blue .cloud-shape {
+            fill: #93c5fd !important;
+            stroke: #1d4ed8 !important;
+        }
+        .cloud-yellow .cloud-shape {
+            fill: #fde047 !important;
+            stroke: #ca8a04 !important;
+        }
+        .cloud-correct {
+            filter: drop-shadow(0 0 8px rgba(22, 163, 74, 0.55));
+        }
+        .cloud-wrong {
+            filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.55));
+        }
+
+        .brush-btn {
+            transition: all 0.2s ease;
+        }
+        .brush-btn.active-brush {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 0 4px #6366f1;
+        }
+
+        /* إعدادات الطباعة */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                box-shadow: none !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin-bottom: 10px !important;
+            }
+            .page-break-avoid {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-5 px-3 sm:px-6 text-slate-800">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ترويسة ورقة العمل (مطابقة للصورة المرفقة UNIT 1 • LESSON 4 - Phonics Fun!) -->
+        <header class="bg-[#1b4388] text-white rounded-3xl shadow-xl overflow-hidden border-4 border-white mb-6 print-container page-break-avoid">
+            <!-- الشريط العلوي: الاسم، الوحدة، الدرجة -->
+            <div class="px-5 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3">
+                <!-- حقل اسم الطالب -->
+                <div class="bg-white text-slate-800 px-4 py-1.5 rounded-2xl flex items-center gap-2 shadow-md min-w-[230px] sm:min-w-[290px]" dir="ltr">
+                    <label for="studentName" class="en-font font-extrabold text-slate-700 text-xs sm:text-sm whitespace-nowrap">Name:</label>
+                    <input type="text" id="studentName" dir="rtl" placeholder="اكتب اسمك هنا..." 
+                        class="w-full bg-transparent border-b-2 border-slate-400 focus:border-indigo-600 focus:outline-none font-bold text-slate-900 px-1 text-sm">
+                </div>
+
+                <!-- رقم الوحدة والدرس -->
+                <div class="text-center mx-auto">
+                    <span class="en-title tracking-wider text-white font-extrabold text-lg sm:text-2xl drop-shadow">UNIT 1 • LESSON 4</span>
+                </div>
+
+                <!-- الدرجة من 12 كما في ترويسة الصورة -->
+                <div class="bg-white text-slate-800 px-5 py-1.5 rounded-2xl font-extrabold flex items-center gap-2 shadow-md" dir="ltr">
+                    <span class="en-font text-slate-700">Score:</span>
+                    <span id="headerScore" class="text-xl text-indigo-700 en-font underline decoration-2">--</span>
+                    <span class="en-font text-slate-700">/ 12</span>
+                </div>
+            </div>
+
+            <!-- النجمة الضاحكة + لوقو Langua Learn، العنوان الرئيسي، اسم المعلم والطائرة الورقية -->
+            <div class="px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 relative">
+                <!-- النجمة المبتسمة + شعار Langua Learn كما في أعلى يسار الصورة -->
+                <div class="flex items-center gap-3 z-10" dir="ltr">
+                    <!-- النجمة الكرتونية المبتسمة -->
+                    <svg class="w-16 h-16 drop-shadow-md flex-shrink-0" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 8 L63 34 L92 38 L71 58 L76 86 L50 73 L24 86 L29 58 L8 38 L37 34 Z" fill="#FACC15" stroke="#EAB308" stroke-width="3" stroke-linejoin="round"/>
+                        <circle cx="41" cy="46" r="3.5" fill="#1E293B"/>
+                        <circle cx="59" cy="46" r="3.5" fill="#1E293B"/>
+                        <circle cx="35" cy="53" r="4" fill="#F87171" opacity="0.6"/>
+                        <circle cx="65" cy="53" r="4" fill="#F87171" opacity="0.6"/>
+                        <path d="M44 55 Q50 61 56 55" stroke="#1E293B" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    </svg>
+                    <!-- لوقو Langua Learn -->
+                    <div class="bg-white/95 px-3 py-1.5 rounded-2xl shadow-md flex items-center gap-2 border border-white">
+                        <svg class="w-9 h-9 flex-shrink-0" viewBox="0 0 100 100" fill="none">
+                            <path d="M10 10 H75 V35 H60 V25 H25 V75 H55 V90 H10 Z" fill="#EB8258"/>
+                            <polygon points="50,35 15,50 50,65 85,50" fill="#3B096C"/>
+                            <path d="M32 58 V74 C32 80 68 80 68 74 V58 L50 67 Z" fill="#4A148C"/>
+                        </svg>
+                        <div class="leading-none text-left en-title">
+                            <div class="text-[#EB8258] font-extrabold text-sm tracking-wider">LANGUA</div>
+                            <div class="text-[#4A148C] font-extrabold text-sm tracking-wider">LEARN</div>
+                            <div class="text-[8px] text-[#EB8258] font-bold tracking-tight mt-0.5">Learn, Grow, Succeed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عنوان الدرس والأصوات المستهدفة -->
+                <div class="text-center z-10">
+                    <h1 class="en-title text-3xl sm:text-5xl font-extrabold tracking-wide text-white drop-shadow-md" dir="ltr">
+                        Phonics Fun!
+                    </h1>
+                    <div class="mt-2.5 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-[#8ecfd4] text-slate-900 px-6 py-1.5 rounded-full text-sm sm:text-xl font-black en-font shadow-md border-2 border-white/70" dir="ltr">
+                        <button onclick="speakText('ee, as in meet')" class="hover:text-indigo-800 transition">ee</button>
+                        <span>•</span>
+                        <button onclick="speakText('ea, as in read')" class="hover:text-indigo-800 transition">ea</button>
+                        <span>•</span>
+                        <button onclick="speakText('i e, as in rice')" class="hover:text-indigo-800 transition">i_e</button>
+                        <span>•</span>
+                        <button onclick="speakText('ie, as in pie')" class="hover:text-indigo-800 transition">ie</button>
+                        <span>•</span>
+                        <button onclick="speakText('ai, as in rain')" class="hover:text-indigo-800 transition">ai</button>
+                        <span>•</span>
+                        <button onclick="speakText('ay, as in play')" class="hover:text-indigo-800 transition">ay</button>
+                    </div>
+                </div>
+
+                <!-- اسم الأستاذ + الطائرة الورقية -->
+                <div class="flex items-center gap-3 z-10">
+                    <div class="text-right">
+                        <div class="text-white text-sm sm:text-base font-extrabold drop-shadow">إعداد الأستاذ: ماجد السويهري</div>
+                        <div class="text-amber-300 text-xs font-bold mt-0.5">اختبار تحديد المستوى التفاعلي</div>
+                    </div>
+                    <!-- أيقونة الطائرة الورقية البيضاء -->
+                    <svg class="w-16 h-16 drop-shadow-md hidden sm:block" viewBox="0 0 100 100" fill="none">
+                        <path d="M12 46 L88 18 L62 82 L44 58 L12 46 Z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M88 18 L44 58 L48 76 L62 66" fill="#CBD5E1"/>
+                        <path d="M88 18 L44 58" stroke="#94A3B8" stroke-width="2"/>
+                        <path d="M15 78 Q 28 85 38 72 T 52 88" stroke="#93C5FD" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- التخطيط الرئيسي: لوحة الأسئلة + أقسام الاختبار الأربعة -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- لوحة الأسئلة والمستوى (على اليمين) -->
+            <aside class="lg:col-span-4 bg-white rounded-3xl shadow-lg border-2 border-indigo-100 p-5 lg:sticky lg:top-4 print-container page-break-avoid">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                    <h2 class="font-extrabold text-lg text-indigo-950 flex items-center gap-2">
+                        <span class="bg-indigo-100 text-indigo-700 p-1.5 rounded-xl">🧭</span>
+                        لوحة الأسئلة والمستوى
+                    </h2>
+                    <span id="progressBadge" class="text-xs font-extrabold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-200">
+                        0 / 16 مجاب
+                    </span>
+                </div>
+
+                <!-- تقسيم الأسئلة حسب الأقسام الأربعة (4 أسئلة لكل قسم) -->
+                <div class="space-y-3 mb-4">
+                    <!-- القسم 1 -->
+                    <div class="bg-teal-50/70 border border-teal-200 rounded-2xl p-2.5">
+                        <div class="flex items-center justify-between text-xs font-extrabold text-teal-900 mb-2">
+                            <span>السؤال 1: صنف الكلمات (Sort)</span>
+                            <span>4 أسئلة</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="scrollToQuestion(1)" id="navBtn-1" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-teal-500 transition">
+                                <span id="navDot-1" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">1</span>
+                            </button>
+                            <button onclick="scrollToQuestion(2)" id="navBtn-2" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-teal-500 transition">
+                                <span id="navDot-2" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">2</span>
+                            </button>
+                            <button onclick="scrollToQuestion(3)" id="navBtn-3" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-teal-500 transition">
+                                <span id="navDot-3" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">3</span>
+                            </button>
+                            <button onclick="scrollToQuestion(4)" id="navBtn-4" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-teal-500 transition">
+                                <span id="navDot-4" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">4</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- القسم 2 -->
+                    <div class="bg-purple-50/70 border border-purple-200 rounded-2xl p-2.5">
+                        <div class="flex items-center justify-between text-xs font-extrabold text-purple-900 mb-2">
+                            <span>السؤال 2: الحرفين الناقصين (i_e / ie)</span>
+                            <span>4 أسئلة</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="scrollToQuestion(5)" id="navBtn-5" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-purple-500 transition">
+                                <span id="navDot-5" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">5</span>
+                            </button>
+                            <button onclick="scrollToQuestion(6)" id="navBtn-6" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-purple-500 transition">
+                                <span id="navDot-6" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">6</span>
+                            </button>
+                            <button onclick="scrollToQuestion(7)" id="navBtn-7" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-purple-500 transition">
+                                <span id="navDot-7" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">7</span>
+                            </button>
+                            <button onclick="scrollToQuestion(8)" id="navBtn-8" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-purple-500 transition">
+                                <span id="navDot-8" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">8</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- القسم 3 -->
+                    <div class="bg-orange-50/70 border border-orange-200 rounded-2xl p-2.5">
+                        <div class="flex items-center justify-between text-xs font-extrabold text-orange-900 mb-2">
+                            <span>السؤال 3: الحرفين الناقصين (ai / ay)</span>
+                            <span>4 أسئلة</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="scrollToQuestion(9)" id="navBtn-9" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-orange-500 transition">
+                                <span id="navDot-9" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">9</span>
+                            </button>
+                            <button onclick="scrollToQuestion(10)" id="navBtn-10" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-orange-500 transition">
+                                <span id="navDot-10" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">10</span>
+                            </button>
+                            <button onclick="scrollToQuestion(11)" id="navBtn-11" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-orange-500 transition">
+                                <span id="navDot-11" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">11</span>
+                            </button>
+                            <button onclick="scrollToQuestion(12)" id="navBtn-12" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-orange-500 transition">
+                                <span id="navDot-12" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">12</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- القسم 4 -->
+                    <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-2.5">
+                        <div class="flex items-center justify-between text-xs font-extrabold text-rose-900 mb-2">
+                            <span>السؤال 4: لوّن الكلمات (Find & color)</span>
+                            <span>4 أسئلة</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="scrollToQuestion(13)" id="navBtn-13" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-rose-500 transition">
+                                <span id="navDot-13" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">13</span>
+                            </button>
+                            <button onclick="scrollToQuestion(14)" id="navBtn-14" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-rose-500 transition">
+                                <span id="navDot-14" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">14</span>
+                            </button>
+                            <button onclick="scrollToQuestion(15)" id="navBtn-15" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-rose-500 transition">
+                                <span id="navDot-15" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">15</span>
+                            </button>
+                            <button onclick="scrollToQuestion(16)" id="navBtn-16" class="py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs hover:border-rose-500 transition">
+                                <span id="navDot-16" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font">16</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- دليل الألوان -->
+                <div class="bg-slate-50 rounded-2xl p-3 text-xs border border-slate-100 mb-4">
+                    <div class="grid grid-cols-2 gap-2 font-bold text-slate-600">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-slate-200 inline-block"></span>
+                            <span>غير مجاب</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span>
+                            <span>تمت الإجابة</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span>إجابة صحيحة</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span>إجابة خاطئة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مؤشر تحديد المستوى -->
+                <div class="border-t border-slate-100 pt-3">
+                    <div class="text-xs font-extrabold text-slate-500 mb-2">مؤشر مستوى الطالب:</div>
+                    <div id="liveLevelBox" class="bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-4 text-center border border-slate-200">
+                        <div class="text-3xl mb-1" id="levelEmoji">📊</div>
+                        <div class="font-extrabold text-slate-800 text-base" id="levelTitle">بانتظار إكمال الاختبار</div>
+                        <p class="text-xs text-slate-600 mt-1" id="levelDesc">أجب عن الأقسام الأربعة ثم اضغط على اعتماد النتيجة لتحديد المستوى.</p>
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم والطباعة -->
+                <div class="mt-4 space-y-2.5 no-print">
+                    <button onclick="evaluateQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-extrabold py-3 px-4 rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                        <span>✅</span>
+                        <span>اعتماد الإجابات وتحديد المستوى</span>
+                    </button>
+
+                    <button onclick="printStudentResult()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-extrabold py-3 px-4 rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                        <span>🖨️</span>
+                        <span>طباعة نتيجة الطالب</span>
+                    </button>
+
+                    <button onclick="resetQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-2xl transition flex items-center justify-center gap-2 text-sm">
+                        <span>🔄</span>
+                        <span>إعادة الاختبار من جديد</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- ورقة الاختبار التفاعلية (الأقسام الأربعة) -->
+            <main class="lg:col-span-8 space-y-6">
+
+                <!-- ========================================== -->
+                <!-- السؤال الأول: 1. Sort the words (4 أسئلة - ضع الكلمة تحت الصندوق المناسب) -->
+                <!-- ========================================== -->
+                <section id="sec-1" class="bg-white rounded-3xl shadow-md border-[3px] border-[#4ca8b0] p-5 sm:p-6 relative print-container page-break-avoid">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="bg-[#4ca8b0] text-white px-5 py-1.5 rounded-2xl shadow-sm">
+                            <h2 class="en-title font-bold text-lg sm:text-xl tracking-wide" dir="ltr">1. Sort the words</h2>
+                        </div>
+                        <span class="text-xs sm:text-sm font-extrabold text-teal-900 bg-teal-50 px-3 py-1 rounded-xl border border-teal-200">
+                            🧺 السؤال 1: اسحب أو اضغط لوضع كل كلمة في السلة المناسبة (4 أسئلة)
+                        </span>
+                    </div>
+
+                    <!-- بنك الكلمات الأربعة -->
+                    <div class="flex flex-wrap items-center justify-center gap-3 bg-[#d4eef2] py-3 px-5 rounded-full max-w-xl mx-auto mb-6 en-font shadow-inner" dir="ltr">
+                        <div id="chip-meet" draggable="true" ondragstart="handleDragStart(event, 'meet')" onclick="handleWordClick('meet')" class="word-chip bg-white hover:bg-sky-50 text-slate-900 font-black px-5 py-1.5 rounded-full shadow-sm border-2 border-teal-400 text-lg flex items-center gap-1.5">
+                            <span>meet</span>
+                            <button type="button" onclick="event.stopPropagation(); speakText('meet')" class="text-xs opacity-60 hover:opacity-100 no-print">🔊</button>
+                        </div>
+                        <span class="text-teal-800 font-black">•</span>
+                        <div id="chip-meat" draggable="true" ondragstart="handleDragStart(event, 'meat')" onclick="handleWordClick('meat')" class="word-chip bg-white hover:bg-sky-50 text-slate-900 font-black px-5 py-1.5 rounded-full shadow-sm border-2 border-teal-400 text-lg flex items-center gap-1.5">
+                            <span>meat</span>
+                            <button type="button" onclick="event.stopPropagation(); speakText('meat')" class="text-xs opacity-60 hover:opacity-100 no-print">🔊</button>
+                        </div>
+                        <span class="text-teal-800 font-black">•</span>
+                        <div id="chip-cheese" draggable="true" ondragstart="handleDragStart(event, 'cheese')" onclick="handleWordClick('cheese')" class="word-chip bg-white hover:bg-sky-50 text-slate-900 font-black px-5 py-1.5 rounded-full shadow-sm border-2 border-teal-400 text-lg flex items-center gap-1.5">
+                            <span>cheese</span>
+                            <button type="button" onclick="event.stopPropagation(); speakText('cheese')" class="text-xs opacity-60 hover:opacity-100 no-print">🔊</button>
+                        </div>
+                        <span class="text-teal-800 font-black">•</span>
+                        <div id="chip-read" draggable="true" ondragstart="handleDragStart(event, 'read')" onclick="handleWordClick('read')" class="word-chip bg-white hover:bg-sky-50 text-slate-900 font-black px-5 py-1.5 rounded-full shadow-sm border-2 border-teal-400 text-lg flex items-center gap-1.5">
+                            <span>read</span>
+                            <button type="button" onclick="event.stopPropagation(); speakText('read')" class="text-xs opacity-60 hover:opacity-100 no-print">🔊</button>
+                        </div>
+                    </div>
+
+                    <!-- السلتان (ee و ea) كما في ورقة العمل -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 sm:px-6 en-font" dir="ltr">
+                        
+                        <!-- سلة ee (السؤال 1 و 2) -->
+                        <div class="flex flex-col items-center">
+                            <div onclick="handleBasketHeaderClick('ee')" class="w-16 h-16 rounded-full bg-[#4ca8b0] text-white border-4 border-white shadow-md flex items-center justify-center font-black text-2xl mb-3 cursor-pointer hover:scale-105 transition ring-2 ring-[#4ca8b0]">
+                                ee
+                            </div>
+                            <div class="woven-basket w-full pt-5 pb-4 px-5">
+                                <div class="basket-cloth p-4 space-y-3">
+                                    <!-- الخانة 1 -->
+                                    <div id="qRow-1">
+                                        <div id="slot-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 1)" onclick="handleSlotClick(1)" class="basket-slot" title="اضغط لوضع الكلمة أو مسحها"></div>
+                                        <div class="text-center"><span id="badge-1" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1 inline-block" dir="rtl"></span></div>
+                                    </div>
+                                    <!-- الخانة 2 -->
+                                    <div id="qRow-2">
+                                        <div id="slot-2" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 2)" onclick="handleSlotClick(2)" class="basket-slot" title="اضغط لوضع الكلمة أو مسحها"></div>
+                                        <div class="text-center"><span id="badge-2" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1 inline-block" dir="rtl"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- سلة ea (السؤال 3 و 4) -->
+                        <div class="flex flex-col items-center">
+                            <div onclick="handleBasketHeaderClick('ea')" class="w-16 h-16 rounded-full bg-[#8067b1] text-white border-4 border-white shadow-md flex items-center justify-center font-black text-2xl mb-3 cursor-pointer hover:scale-105 transition ring-2 ring-[#8067b1]">
+                                ea
+                            </div>
+                            <div class="woven-basket w-full pt-5 pb-4 px-5">
+                                <div class="basket-cloth p-4 space-y-3">
+                                    <!-- الخانة 3 -->
+                                    <div id="qRow-3">
+                                        <div id="slot-3" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 3)" onclick="handleSlotClick(3)" class="basket-slot" title="اضغط لوضع الكلمة أو مسحها"></div>
+                                        <div class="text-center"><span id="badge-3" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1 inline-block" dir="rtl"></span></div>
+                                    </div>
+                                    <!-- الخانة 4 -->
+                                    <div id="qRow-4">
+                                        <div id="slot-4" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 4)" onclick="handleSlotClick(4)" class="basket-slot" title="اضغط لوضع الكلمة أو مسحها"></div>
+                                        <div class="text-center"><span id="badge-4" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1 inline-block" dir="rtl"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- السؤال الثاني: 2. Complete the words (4 أسئلة - أوجد الحرفين الناقصين i_e / ie) -->
+                <!-- ========================================== -->
+                <section id="sec-2" class="bg-white rounded-3xl shadow-md border-[3px] border-[#8067b1] p-5 sm:p-6 relative print-container page-break-avoid">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                        <div class="bg-[#8067b1] text-white px-5 py-1.5 rounded-2xl shadow-sm">
+                            <h2 class="en-title font-bold text-lg sm:text-xl tracking-wide" dir="ltr">2. Complete the words</h2>
+                        </div>
+                        <span class="text-xs sm:text-sm font-extrabold text-purple-900 bg-purple-50 px-3 py-1 rounded-xl border border-purple-200">
+                            ✍️ السؤال 2: اختر الحرفين الناقصين (i_e أو ie) لإكمال الكلمة (4 أسئلة)
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 en-font" dir="ltr">
+                        
+                        <!-- فقرة 5: rice -->
+                        <div id="qRow-5" class="bg-slate-50/90 border-2 border-purple-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-purple-800 mb-1">
+                                <span>#5</span>
+                                <button type="button" onclick="speakText('rice')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة وعاء الأرز -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <path d="M18 48 C18 22 82 22 82 48 Z" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2.5"/>
+                                <circle cx="38" cy="36" r="2" fill="#CBD5E1"/>
+                                <circle cx="52" cy="32" r="2" fill="#CBD5E1"/>
+                                <circle cx="62" cy="38" r="2" fill="#CBD5E1"/>
+                                <circle cx="45" cy="42" r="2" fill="#CBD5E1"/>
+                                <path d="M14 48 H86 C84 76 68 86 50 86 C32 86 16 76 14 48 Z" fill="#2563EB" stroke="#1E3A8A" stroke-width="2.5"/>
+                                <path d="M32 86 H68 L64 92 H36 Z" fill="#1D4ED8"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-5" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                r<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>ce
+                            </div>
+                            <!-- أزرار الاختيار i_e / ie -->
+                            <div class="inline-flex items-center gap-1 bg-purple-100 p-1 rounded-full border border-purple-300">
+                                <button type="button" id="pill-5-i_e" onclick="selectMissingLetters(5, 'i_e')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">i_e</button>
+                                <span class="text-purple-400 font-bold">/</span>
+                                <button type="button" id="pill-5-ie" onclick="selectMissingLetters(5, 'ie')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">ie</button>
+                            </div>
+                            <span id="badge-5" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 6: pie -->
+                        <div id="qRow-6" class="bg-slate-50/90 border-2 border-purple-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-purple-800 mb-1">
+                                <span>#6</span>
+                                <button type="button" onclick="speakText('pie')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة الفطيرة بالكرز -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <path d="M14 58 L22 82 H78 L86 58 Z" fill="#38BDF8" stroke="#0369A1" stroke-width="2.5"/>
+                                <ellipse cx="50" cy="54" rx="38" ry="16" fill="#F59E0B" stroke="#B45309" stroke-width="2.5"/>
+                                <path d="M20 54 Q30 62 40 54 T60 54 T80 54" stroke="#B45309" stroke-width="2.5" fill="none"/>
+                                <circle cx="50" cy="36" r="7" fill="#DC2626" stroke="#7F1D1D" stroke-width="2"/>
+                                <path d="M50 29 Q56 18 64 20" stroke="#15803D" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-6" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                p<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>
+                            </div>
+                            <!-- أزرار الاختيار i_e / ie -->
+                            <div class="inline-flex items-center gap-1 bg-purple-100 p-1 rounded-full border border-purple-300">
+                                <button type="button" id="pill-6-i_e" onclick="selectMissingLetters(6, 'i_e')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">i_e</button>
+                                <span class="text-purple-400 font-bold">/</span>
+                                <button type="button" id="pill-6-ie" onclick="selectMissingLetters(6, 'ie')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">ie</button>
+                            </div>
+                            <span id="badge-6" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 7: tie -->
+                        <div id="qRow-7" class="bg-slate-50/90 border-2 border-purple-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-purple-800 mb-1">
+                                <span>#7</span>
+                                <button type="button" onclick="speakText('tie')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة ربطة العنق الزرقاء -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <polygon points="40,12 60,12 56,26 44,26" fill="#2563EB" stroke="#1E3A8A" stroke-width="2.5"/>
+                                <polygon points="44,26 56,26 64,74 50,90 36,74" fill="#3B82F6" stroke="#1E3A8A" stroke-width="2.5"/>
+                                <line x1="42" y1="38" x2="58" y2="46" stroke="#93C5FD" stroke-width="4"/>
+                                <line x1="39" y1="54" x2="61" y2="64" stroke="#93C5FD" stroke-width="4"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-7" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                t<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>
+                            </div>
+                            <!-- أزرار الاختيار i_e / ie -->
+                            <div class="inline-flex items-center gap-1 bg-purple-100 p-1 rounded-full border border-purple-300">
+                                <button type="button" id="pill-7-i_e" onclick="selectMissingLetters(7, 'i_e')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">i_e</button>
+                                <span class="text-purple-400 font-bold">/</span>
+                                <button type="button" id="pill-7-ie" onclick="selectMissingLetters(7, 'ie')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">ie</button>
+                            </div>
+                            <span id="badge-7" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 8: pine -->
+                        <div id="qRow-8" class="bg-slate-50/90 border-2 border-purple-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-purple-800 mb-1">
+                                <span>#8</span>
+                                <button type="button" onclick="speakText('pine')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة شجرة الصنوبر -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <rect x="44" y="74" width="12" height="16" rx="2" fill="#78350F"/>
+                                <polygon points="50,10 26,40 74,40" fill="#16A34A" stroke="#14532D" stroke-width="2"/>
+                                <polygon points="50,26 20,58 80,58" fill="#15803D" stroke="#14532D" stroke-width="2"/>
+                                <polygon points="50,44 14,76 86,76" fill="#166534" stroke="#14532D" stroke-width="2"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-8" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                p<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>ne
+                            </div>
+                            <!-- أزرار الاختيار i_e / ie -->
+                            <div class="inline-flex items-center gap-1 bg-purple-100 p-1 rounded-full border border-purple-300">
+                                <button type="button" id="pill-8-i_e" onclick="selectMissingLetters(8, 'i_e')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">i_e</button>
+                                <span class="text-purple-400 font-bold">/</span>
+                                <button type="button" id="pill-8-ie" onclick="selectMissingLetters(8, 'ie')" class="phonics-choice-pill text-purple-950 hover:bg-purple-200">ie</button>
+                            </div>
+                            <span id="badge-8" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- السؤال الثالث: 3. Choose ai or ay (4 أسئلة - أوجد الحرفين الناقصين ai / ay) -->
+                <!-- ========================================== -->
+                <section id="sec-3" class="bg-white rounded-3xl shadow-md border-[3px] border-[#eb8b6a] p-5 sm:p-6 relative print-container page-break-avoid">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                        <div class="bg-[#eb8b6a] text-white px-5 py-1.5 rounded-2xl shadow-sm">
+                            <h2 class="en-title font-bold text-lg sm:text-xl tracking-wide" dir="ltr">3. Choose ai or ay</h2>
+                        </div>
+                        <span class="text-xs sm:text-sm font-extrabold text-orange-900 bg-orange-50 px-3 py-1 rounded-xl border border-orange-200">
+                            🌧️ السؤال 3: اختر الحرفين الناقصين (ai أو ay) لإكمال الكلمة (4 أسئلة)
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 en-font" dir="ltr">
+                        
+                        <!-- فقرة 9: rain -->
+                        <div id="qRow-9" class="bg-slate-50/90 border-2 border-orange-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-orange-800 mb-1">
+                                <span>#9</span>
+                                <button type="button" onclick="speakText('rain')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة غيمة المطر -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <path d="M24 56 C14 56 12 42 22 38 C24 24 42 20 50 28 C60 20 78 26 78 40 C88 42 86 56 76 56 Z" fill="#94A3B8" stroke="#475569" stroke-width="2.5"/>
+                                <path d="M30 66 L26 78 M45 66 L41 78 M60 66 L56 78 M72 66 L68 78" stroke="#0284C7" stroke-width="3.5" stroke-linecap="round"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-9" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                r<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>n
+                            </div>
+                            <!-- أزرار الاختيار ai / ay -->
+                            <div class="inline-flex items-center gap-1 bg-orange-100 p-1 rounded-full border border-orange-300">
+                                <button type="button" id="pill-9-ai" onclick="selectMissingLetters(9, 'ai')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ai</button>
+                                <span class="text-orange-400 font-bold">/</span>
+                                <button type="button" id="pill-9-ay" onclick="selectMissingLetters(9, 'ay')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ay</button>
+                            </div>
+                            <span id="badge-9" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 10: train -->
+                        <div id="qRow-10" class="bg-slate-50/90 border-2 border-orange-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-orange-800 mb-1">
+                                <span>#10</span>
+                                <button type="button" onclick="speakText('train')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة القطار الملون -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <rect x="18" y="42" width="38" height="28" rx="4" fill="#2563EB" stroke="#1E3A8A" stroke-width="2"/>
+                                <rect x="40" y="28" width="22" height="42" rx="4" fill="#EF4444" stroke="#991B1B" stroke-width="2"/>
+                                <rect x="45" y="34" width="12" height="12" rx="2" fill="#BAE6FD"/>
+                                <rect x="22" y="26" width="8" height="16" fill="#F59E0B" stroke="#9A3412" stroke-width="2"/>
+                                <rect x="65" y="46" width="24" height="24" rx="3" fill="#22C55E" stroke="#14532D" stroke-width="2"/>
+                                <circle cx="28" cy="74" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2.5"/>
+                                <circle cx="50" cy="74" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2.5"/>
+                                <circle cx="77" cy="74" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2.5"/>
+                                <line x1="8" y1="82" x2="92" y2="82" stroke="#475569" stroke-width="3"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-10" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                tr<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>n
+                            </div>
+                            <!-- أزرار الاختيار ai / ay -->
+                            <div class="inline-flex items-center gap-1 bg-orange-100 p-1 rounded-full border border-orange-300">
+                                <button type="button" id="pill-10-ai" onclick="selectMissingLetters(10, 'ai')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ai</button>
+                                <span class="text-orange-400 font-bold">/</span>
+                                <button type="button" id="pill-10-ay" onclick="selectMissingLetters(10, 'ay')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ay</button>
+                            </div>
+                            <span id="badge-10" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 11: play -->
+                        <div id="qRow-11" class="bg-slate-50/90 border-2 border-orange-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-orange-800 mb-1">
+                                <span>#11</span>
+                                <button type="button" onclick="speakText('play')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة طفلين يلعبان بالكرة -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <circle cx="26" cy="40" r="10" fill="#FDBA74"/>
+                                <path d="M18 72 L21 50 H31 L34 72 Z" fill="#22C55E"/>
+                                <circle cx="74" cy="42" r="10" fill="#FDBA74"/>
+                                <path d="M66 72 L69 52 H79 L82 72 Z" fill="#EC4899"/>
+                                <circle cx="50" cy="24" r="9" fill="#FACC15" stroke="#EF4444" stroke-width="2.5"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-11" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                pl<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>
+                            </div>
+                            <!-- أزرار الاختيار ai / ay -->
+                            <div class="inline-flex items-center gap-1 bg-orange-100 p-1 rounded-full border border-orange-300">
+                                <button type="button" id="pill-11-ai" onclick="selectMissingLetters(11, 'ai')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ai</button>
+                                <span class="text-orange-400 font-bold">/</span>
+                                <button type="button" id="pill-11-ay" onclick="selectMissingLetters(11, 'ay')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ay</button>
+                            </div>
+                            <span id="badge-11" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 12: day -->
+                        <div id="qRow-12" class="bg-slate-50/90 border-2 border-orange-100 rounded-2xl p-3 flex flex-col items-center text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-orange-800 mb-1">
+                                <span>#12</span>
+                                <button type="button" onclick="speakText('day')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- رسمة الشمس المشرقة -->
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" fill="none">
+                                <g stroke="#F59E0B" stroke-width="4" stroke-linecap="round">
+                                    <line x1="50" y1="10" x2="50" y2="20"/>
+                                    <line x1="50" y1="80" x2="50" y2="90"/>
+                                    <line x1="10" y1="50" x2="20" y2="50"/>
+                                    <line x1="80" y1="50" x2="90" y2="50"/>
+                                    <line x1="22" y1="22" x2="29" y2="29"/>
+                                    <line x1="71" y1="71" x2="78" y2="78"/>
+                                    <line x1="78" y1="22" x2="71" y2="29"/>
+                                    <line x1="29" y1="71" x2="22" y2="78"/>
+                                </g>
+                                <circle cx="50" cy="50" r="24" fill="#FACC15" stroke="#EAB308" stroke-width="2.5"/>
+                                <circle cx="42" cy="46" r="3" fill="#1E293B"/>
+                                <circle cx="58" cy="46" r="3" fill="#1E293B"/>
+                                <path d="M44 55 Q50 60 56 55" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                            </svg>
+                            <!-- الكلمة الناقصة -->
+                            <div id="wordDisplay-12" class="text-xl sm:text-2xl font-black text-slate-800 tracking-wider mb-2">
+                                d<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>
+                            </div>
+                            <!-- أزرار الاختيار ai / ay -->
+                            <div class="inline-flex items-center gap-1 bg-orange-100 p-1 rounded-full border border-orange-300">
+                                <button type="button" id="pill-12-ai" onclick="selectMissingLetters(12, 'ai')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ai</button>
+                                <span class="text-orange-400 font-bold">/</span>
+                                <button type="button" id="pill-12-ay" onclick="selectMissingLetters(12, 'ay')" class="phonics-choice-pill text-orange-950 hover:bg-orange-200">ay</button>
+                            </div>
+                            <span id="badge-12" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-2" dir="rtl"></span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- السؤال الرابع: 4. Find and color (4 أسئلة - لوّن ee/ea بالأزرق و ai/ay بالأصفر) -->
+                <!-- ========================================== -->
+                <section id="sec-4" class="bg-white rounded-3xl shadow-md border-[3px] border-[#e26d5c] p-5 sm:p-6 relative print-container page-break-avoid">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="bg-[#e26d5c] text-white px-5 py-1.5 rounded-2xl shadow-sm">
+                            <h2 class="en-title font-bold text-lg sm:text-xl tracking-wide" dir="ltr">4. Find and color</h2>
+                        </div>
+                        <span class="text-xs sm:text-sm font-extrabold text-rose-900 bg-rose-50 px-3 py-1 rounded-xl border border-rose-200">
+                            🎨 السؤال 4: لوّن الكلمات التي فيها (ee / ea) بالأزرق، والتي فيها (ai / ay) بالأصفر (4 أسئلة)
+                        </span>
+                    </div>
+
+                    <!-- تعليمة التلوين + فرش الألوان التفاعلية -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 mb-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="en-font font-extrabold text-sm sm:text-base text-slate-800 text-center" dir="ltr">
+                            Color <span class="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-lg font-black">ee/ea</span> words blue.
+                            Color <span class="bg-yellow-200 text-yellow-900 px-2 py-0.5 rounded-lg font-black">ai/ay</span> words yellow.
+                        </div>
+                        <div class="flex items-center gap-2 no-print">
+                            <span class="text-xs font-extrabold text-slate-600">الفرشاة النشطة:</span>
+                            <button type="button" id="brush-blue" onclick="setActiveBrush('blue')" class="brush-btn active-brush bg-blue-500 text-white font-extrabold text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                                <span>🔵</span> <span>أزرق (ee / ea)</span>
+                            </button>
+                            <button type="button" id="brush-yellow" onclick="setActiveBrush('yellow')" class="brush-btn bg-yellow-400 text-slate-900 font-extrabold text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                                <span>🟡</span> <span>أصفر (ai / ay)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الغيمات الأربعة للتلوين -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 en-font" dir="ltr">
+                        
+                        <!-- فقرة 13: train (ai -> yellow) -->
+                        <div id="qRow-13" class="bg-slate-50/70 border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-between text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-slate-500 mb-1">
+                                <span>#13</span>
+                                <button type="button" onclick="speakText('train')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- الغيمة القابلة للتلوين -->
+                            <div id="cloudWrap-13" onclick="paintCloud(13)" class="word-cloud-svg w-full max-w-[140px]">
+                                <svg viewBox="0 0 160 95" class="w-full h-auto">
+                                    <path class="cloud-shape" d="M 32,74 C 14,74 10,52 24,44 C 24,24 50,18 64,28 C 76,14 108,18 114,36 C 132,34 146,50 136,66 C 142,76 128,82 114,78 C 102,86 78,84 68,78 C 54,84 38,80 32,74 Z"/>
+                                    <text x="80" y="58" text-anchor="middle" fill="#0f172a" font-size="24" font-weight="900" font-family="Nunito, sans-serif">train</text>
+                                </svg>
+                            </div>
+                            <!-- أزرار التلوين السريع -->
+                            <div class="flex items-center gap-1.5 my-1.5 no-print" dir="rtl">
+                                <button type="button" onclick="paintCloudDirect(13, 'blue')" class="text-[11px] font-extrabold bg-blue-100 hover:bg-blue-200 text-blue-900 px-2.5 py-1 rounded-lg border border-blue-300">🔵 أزرق</button>
+                                <button type="button" onclick="paintCloudDirect(13, 'yellow')" class="text-[11px] font-extrabold bg-yellow-100 hover:bg-yellow-200 text-yellow-900 px-2.5 py-1 rounded-lg border border-yellow-400">🟡 أصفر</button>
+                            </div>
+                            <!-- رسمة القطار أسفل الغيمة -->
+                            <svg class="w-16 h-14 mt-1" viewBox="0 0 100 80" fill="none">
+                                <rect x="15" y="28" width="40" height="28" rx="4" fill="#2563EB"/>
+                                <rect x="45" y="16" width="24" height="40" rx="4" fill="#EF4444"/>
+                                <rect x="69" y="32" width="20" height="24" rx="3" fill="#F59E0B"/>
+                                <circle cx="28" cy="60" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2"/>
+                                <circle cx="55" cy="60" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2"/>
+                                <circle cx="79" cy="60" r="7" fill="#FACC15" stroke="#1E293B" stroke-width="2"/>
+                            </svg>
+                            <span id="badge-13" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 14: play (ay -> yellow) -->
+                        <div id="qRow-14" class="bg-slate-50/70 border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-between text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-slate-500 mb-1">
+                                <span>#14</span>
+                                <button type="button" onclick="speakText('play')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- الغيمة القابلة للتلوين -->
+                            <div id="cloudWrap-14" onclick="paintCloud(14)" class="word-cloud-svg w-full max-w-[140px]">
+                                <svg viewBox="0 0 160 95" class="w-full h-auto">
+                                    <path class="cloud-shape" d="M 32,74 C 14,74 10,52 24,44 C 24,24 50,18 64,28 C 76,14 108,18 114,36 C 132,34 146,50 136,66 C 142,76 128,82 114,78 C 102,86 78,84 68,78 C 54,84 38,80 32,74 Z"/>
+                                    <text x="80" y="58" text-anchor="middle" fill="#0f172a" font-size="24" font-weight="900" font-family="Nunito, sans-serif">play</text>
+                                </svg>
+                            </div>
+                            <!-- أزرار التلوين السريع -->
+                            <div class="flex items-center gap-1.5 my-1.5 no-print" dir="rtl">
+                                <button type="button" onclick="paintCloudDirect(14, 'blue')" class="text-[11px] font-extrabold bg-blue-100 hover:bg-blue-200 text-blue-900 px-2.5 py-1 rounded-lg border border-blue-300">🔵 أزرق</button>
+                                <button type="button" onclick="paintCloudDirect(14, 'yellow')" class="text-[11px] font-extrabold bg-yellow-100 hover:bg-yellow-200 text-yellow-900 px-2.5 py-1 rounded-lg border border-yellow-400">🟡 أصفر</button>
+                            </div>
+                            <!-- رسمة طفلين يلعبان أسفل الغيمة -->
+                            <svg class="w-16 h-14 mt-1" viewBox="0 0 100 80" fill="none">
+                                <circle cx="28" cy="30" r="10" fill="#FDBA74"/>
+                                <path d="M20 65 L23 42 H33 L36 65 Z" fill="#22C55E"/>
+                                <circle cx="72" cy="32" r="10" fill="#FDBA74"/>
+                                <path d="M64 65 L67 44 H77 L80 65 Z" fill="#EC4899"/>
+                                <circle cx="50" cy="18" r="8" fill="#38BDF8" stroke="#1E293B" stroke-width="2"/>
+                            </svg>
+                            <span id="badge-14" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 15: meat (ea -> blue) -->
+                        <div id="qRow-15" class="bg-slate-50/70 border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-between text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-slate-500 mb-1">
+                                <span>#15</span>
+                                <button type="button" onclick="speakText('meat')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- الغيمة القابلة للتلوين -->
+                            <div id="cloudWrap-15" onclick="paintCloud(15)" class="word-cloud-svg w-full max-w-[140px]">
+                                <svg viewBox="0 0 160 95" class="w-full h-auto">
+                                    <path class="cloud-shape" d="M 32,74 C 14,74 10,52 24,44 C 24,24 50,18 64,28 C 76,14 108,18 114,36 C 132,34 146,50 136,66 C 142,76 128,82 114,78 C 102,86 78,84 68,78 C 54,84 38,80 32,74 Z"/>
+                                    <text x="80" y="58" text-anchor="middle" fill="#0f172a" font-size="24" font-weight="900" font-family="Nunito, sans-serif">meat</text>
+                                </svg>
+                            </div>
+                            <!-- أزرار التلوين السريع -->
+                            <div class="flex items-center gap-1.5 my-1.5 no-print" dir="rtl">
+                                <button type="button" onclick="paintCloudDirect(15, 'blue')" class="text-[11px] font-extrabold bg-blue-100 hover:bg-blue-200 text-blue-900 px-2.5 py-1 rounded-lg border border-blue-300">🔵 أزرق</button>
+                                <button type="button" onclick="paintCloudDirect(15, 'yellow')" class="text-[11px] font-extrabold bg-yellow-100 hover:bg-yellow-200 text-yellow-900 px-2.5 py-1 rounded-lg border border-yellow-400">🟡 أصفر</button>
+                            </div>
+                            <!-- رسمة قطعة اللحم أسفل الغيمة -->
+                            <svg class="w-16 h-14 mt-1" viewBox="0 0 100 80" fill="none">
+                                <path d="M22 42 C18 22 52 14 72 26 C88 36 84 62 62 66 C38 70 26 60 22 42 Z" fill="#FCA5A5" stroke="#991B1B" stroke-width="2.5"/>
+                                <path d="M28 40 C26 26 50 20 66 30 C78 38 76 56 58 60 C40 62 30 54 28 40 Z" fill="#EF4444"/>
+                                <circle cx="48" cy="42" r="6" fill="#FEF2F2"/>
+                            </svg>
+                            <span id="badge-15" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1" dir="rtl"></span>
+                        </div>
+
+                        <!-- فقرة 16: meet (ee -> blue) -->
+                        <div id="qRow-16" class="bg-slate-50/70 border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-between text-center transition">
+                            <div class="w-full flex justify-between items-center text-[11px] font-bold text-slate-500 mb-1">
+                                <span>#16</span>
+                                <button type="button" onclick="speakText('meet')" class="no-print hover:scale-110">🔊</button>
+                            </div>
+                            <!-- الغيمة القابلة للتلوين -->
+                            <div id="cloudWrap-16" onclick="paintCloud(16)" class="word-cloud-svg w-full max-w-[140px]">
+                                <svg viewBox="0 0 160 95" class="w-full h-auto">
+                                    <path class="cloud-shape" d="M 32,74 C 14,74 10,52 24,44 C 24,24 50,18 64,28 C 76,14 108,18 114,36 C 132,34 146,50 136,66 C 142,76 128,82 114,78 C 102,86 78,84 68,78 C 54,84 38,80 32,74 Z"/>
+                                    <text x="80" y="58" text-anchor="middle" fill="#0f172a" font-size="24" font-weight="900" font-family="Nunito, sans-serif">meet</text>
+                                </svg>
+                            </div>
+                            <!-- أزرار التلوين السريع -->
+                            <div class="flex items-center gap-1.5 my-1.5 no-print" dir="rtl">
+                                <button type="button" onclick="paintCloudDirect(16, 'blue')" class="text-[11px] font-extrabold bg-blue-100 hover:bg-blue-200 text-blue-900 px-2.5 py-1 rounded-lg border border-blue-300">🔵 أزرق</button>
+                                <button type="button" onclick="paintCloudDirect(16, 'yellow')" class="text-[11px] font-extrabold bg-yellow-100 hover:bg-yellow-200 text-yellow-900 px-2.5 py-1 rounded-lg border border-yellow-400">🟡 أصفر</button>
+                            </div>
+                            <!-- رسمة ولدين يتصافحان (meet) أسفل الغيمة -->
+                            <svg class="w-16 h-14 mt-1" viewBox="0 0 100 80" fill="none">
+                                <circle cx="30" cy="26" r="10" fill="#FDBA74"/>
+                                <path d="M20 66 L24 38 H36 L40 66 Z" fill="#16A34A"/>
+                                <circle cx="70" cy="26" r="10" fill="#FDBA74"/>
+                                <path d="M60 66 L64 38 H76 L80 66 Z" fill="#EAB308"/>
+                                <line x1="38" y1="48" x2="62" y2="48" stroke="#FDBA74" stroke-width="5" stroke-linecap="round"/>
+                            </svg>
+                            <span id="badge-16" class="hidden text-[11px] font-extrabold px-2 py-0.5 rounded-full mt-1" dir="rtl"></span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- بطاقة تقرير نتيجة ومستوى الطالب للطباعة -->
+                <!-- ========================================== -->
+                <section id="resultReportCard" class="hidden bg-white rounded-3xl shadow-xl border-4 border-indigo-200 p-6 sm:p-8 print-container page-break-avoid">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-slate-100 pb-4 mb-6">
+                        <div>
+                            <span class="text-xs font-extrabold bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">تقرير تحديد المستوى المعتمد - UNIT 1 • LESSON 4</span>
+                            <h2 class="text-2xl font-extrabold text-slate-900 mt-1">بطاقة نتيجة وتقييم مستوى الطالب (Phonics Fun!)</h2>
+                        </div>
+                        <div class="text-left text-xs text-slate-500 font-bold" id="reportDate"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="text-xs text-slate-500 font-bold">اسم الطالب</div>
+                            <div id="reportStudentName" class="text-lg font-extrabold text-slate-900 mt-1">غير محدد</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="text-xs text-slate-500 font-bold">الدرجة النهائية</div>
+                            <div id="reportFinalScore" class="text-2xl font-extrabold text-indigo-700 en-font mt-0.5">0 / 12</div>
+                            <div id="reportRawScore" class="text-xs font-bold text-slate-500 mt-0.5">0 من 16 فقرة صحيحة</div>
+                        </div>
+                        <div id="reportLevelBadgeBox" class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
+                            <div class="text-xs text-emerald-700 font-bold">المستوى العام</div>
+                            <div id="reportFinalLevel" class="text-lg font-extrabold text-emerald-900 mt-1">--</div>
+                        </div>
+                    </div>
+
+                    <!-- تحليل المهارات حسب الأقسام الأربعة -->
+                    <h3 class="font-extrabold text-sm text-slate-700 mb-3">تحليل أداء الطالب في أقسام الاختبار الأربعة:</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6" id="skillsBreakdown"></div>
+
+                    <!-- التوصية التربوية وتوقيع المعلم -->
+                    <div class="bg-indigo-50/70 rounded-2xl p-4 border border-indigo-100 flex flex-col sm:flex-row items-start sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs font-extrabold text-indigo-900 mb-1">💡 التوصية التربوية:</div>
+                            <p id="reportRecommendation" class="text-sm font-bold text-slate-700"></p>
+                        </div>
+                        <div class="border-r-2 border-indigo-200 pr-4 whitespace-nowrap text-right">
+                            <div class="text-xs text-slate-500 font-bold">إعداد وإشراف معلم المادة:</div>
+                            <div class="text-base font-extrabold text-indigo-950">الأستاذ ماجد السويهري</div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // مفاتيح الإجابات الصحيحة للفقرات الـ 16 (4 أسئلة لكل قسم)
+        const correctAnswers = {
+            // السؤال 1: صنف الكلمات في السلة المناسبة (1 و 2 لسلة ee، 3 و 4 لسلة ea)
+            1: 'ee (meet / cheese)',
+            2: 'ee (meet / cheese)',
+            3: 'ea (meat / read)',
+            4: 'ea (meat / read)',
+            // السؤال 2: الحرفين الناقصين (i_e / ie)
+            5: 'i_e', // rice
+            6: 'ie',  // pie
+            7: 'ie',  // tie
+            8: 'i_e', // pine
+            // السؤال 3: الحرفين الناقصين (ai / ay)
+            9: 'ai',  // rain
+            10: 'ai', // train
+            11: 'ay', // play
+            12: 'ay', // day
+            // السؤال 4: لوّن الكلمات (ee/ea بالأزرق، ai/ay بالأصفر)
+            13: 'yellow', // train (ai)
+            14: 'yellow', // play (ay)
+            15: 'blue',   // meat (ea)
+            16: 'blue'    // meet (ee)
+        };
+
+        // قوالب عرض الكلمات في السؤالين 2 و 3 عند اختيار الحرفين الناقصين
+        const wordTemplates = {
+            5: { defaultHtml: 'r<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>ce', 'i_e': 'r<span class="text-indigo-600 font-black">i</span>c<span class="text-indigo-600 font-black">e</span>', 'ie': 'r<span class="text-indigo-600 font-black">ie</span>ce' },
+            6: { defaultHtml: 'p<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>', 'i_e': 'p<span class="text-indigo-600 font-black">i_e</span>', 'ie': 'p<span class="text-indigo-600 font-black">ie</span>' },
+            7: { defaultHtml: 't<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>', 'i_e': 't<span class="text-indigo-600 font-black">i_e</span>', 'ie': 't<span class="text-indigo-600 font-black">ie</span>' },
+            8: { defaultHtml: 'p<span class="text-purple-600 underline decoration-2 mx-0.5">__</span>ne', 'i_e': 'p<span class="text-indigo-600 font-black">i</span>n<span class="text-indigo-600 font-black">e</span>', 'ie': 'p<span class="text-indigo-600 font-black">ie</span>ne' },
+            9: { defaultHtml: 'r<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>n', 'ai': 'r<span class="text-indigo-600 font-black">ai</span>n', 'ay': 'r<span class="text-indigo-600 font-black">ay</span>n' },
+            10: { defaultHtml: 'tr<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>n', 'ai': 'tr<span class="text-indigo-600 font-black">ai</span>n', 'ay': 'tr<span class="text-indigo-600 font-black">ay</span>n' },
+            11: { defaultHtml: 'pl<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>', 'ai': 'pl<span class="text-indigo-600 font-black">ai</span>', 'ay': 'pl<span class="text-indigo-600 font-black">ay</span>' },
+            12: { defaultHtml: 'd<span class="text-orange-600 underline decoration-2 mx-0.5">__</span>', 'ai': 'd<span class="text-indigo-600 font-black">ai</span>', 'ay': 'd<span class="text-indigo-600 font-black">ay</span>' }
+        };
+
+        // حالة إجابات الطالب الحالية (16 سؤالاً)
+        let userAnswers = {};
+        for (let i = 1; i <= 16; i++) {
+            userAnswers[i] = null;
+        }
+
+        let isSubmitted = false;
+        let selectedWordForClick = null;
+        let activeBrushColor = 'blue';
+
+        // التحقق من صحة إجابة سؤال معين
+        function isQuestionCorrect(qNum) {
+            const ans = userAnswers[qNum];
+            if (!ans) return false;
+
+            // السؤال الأول: الخانتان 1 و 2 لسلة ee (تقبل meet أو cheese بأي ترتيب)
+            if (qNum === 1 || qNum === 2) {
+                return ans === 'meet' || ans === 'cheese';
+            }
+            // السؤال الأول: الخانتان 3 و 4 لسلة ea (تقبل meat أو read بأي ترتيب)
+            if (qNum === 3 || qNum === 4) {
+                return ans === 'meat' || ans === 'read';
+            }
+
+            return ans === correctAnswers[qNum];
+        }
+
+        // ==========================================
+        // 1. دوال السؤال الأول: Sort the words (السحب والإفلات في السلتين ee و ea)
+        // ==========================================
+        function handleDragStart(e, word) {
+            e.dataTransfer.setData('text/plain', word);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, slotNum) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const word = e.dataTransfer.getData('text/plain');
+            if (word) {
+                placeWordInBasketSlot(slotNum, word);
+            }
+        }
+
+        function handleWordClick(word) {
+            if (selectedWordForClick === word) {
+                clearSelectedWordChip();
+                return;
+            }
+            clearSelectedWordChip();
+            selectedWordForClick = word;
+            const chip = document.getElementById(`chip-${word}`);
+            if (chip) chip.classList.add('active-word');
+        }
+
+        function clearSelectedWordChip() {
+            if (selectedWordForClick) {
+                const chip = document.getElementById(`chip-${selectedWordForClick}`);
+                if (chip) chip.classList.remove('active-word');
+            }
+            selectedWordForClick = null;
+        }
+
+        function handleBasketHeaderClick(basketType) {
+            if (!selectedWordForClick) return;
+            const targetSlots = basketType === 'ee' ? [1, 2] : [3, 4];
+            const emptySlot = targetSlots.find(s => !userAnswers[s]) || targetSlots[0];
+            placeWordInBasketSlot(emptySlot, selectedWordForClick);
+            clearSelectedWordChip();
+        }
+
+        function handleSlotClick(slotNum) {
+            if (isSubmitted) unlockForEditing();
+
+            if (selectedWordForClick) {
+                placeWordInBasketSlot(slotNum, selectedWordForClick);
+                clearSelectedWordChip();
+            } else if (userAnswers[slotNum]) {
+                userAnswers[slotNum] = null;
+                refreshBasketSlotsUI();
+                updateNavigationPanel();
+            }
+        }
+
+        function placeWordInBasketSlot(slotNum, word) {
+            if (isSubmitted) unlockForEditing();
+
+            // إزالة الكلمة إذا كانت موضوعة في خانة أخرى لمنع التكرار
+            [1, 2, 3, 4].forEach(s => {
+                if (userAnswers[s] === word) {
+                    userAnswers[s] = null;
+                }
+            });
+
+            userAnswers[slotNum] = word;
+            refreshBasketSlotsUI();
+            updateNavigationPanel();
+        }
+
+        function refreshBasketSlotsUI() {
+            const allWords = ['meet', 'meat', 'cheese', 'read'];
+            const usedWords = [userAnswers[1], userAnswers[2], userAnswers[3], userAnswers[4]].filter(Boolean);
+
+            allWords.forEach(w => {
+                const chip = document.getElementById(`chip-${w}`);
+                if (chip) {
+                    if (usedWords.includes(w)) {
+                        chip.classList.add('used-word');
+                    } else {
+                        chip.classList.remove('used-word');
+                    }
+                }
+            });
+
+            [1, 2, 3, 4].forEach(s => {
+                const slotEl = document.getElementById(`slot-${s}`);
+                const val = userAnswers[s];
+                slotEl.textContent = val || '';
+                slotEl.classList.remove('filled', 'correct-slot', 'wrong-slot');
+                if (val) {
+                    slotEl.classList.add('filled');
+                }
+            });
+        }
+
+        // ==========================================
+        // 2. دوال السؤالين الثاني والثالث: اختيار الحرفين الناقصين (i_e / ie و ai / ay)
+        // ==========================================
+        function selectMissingLetters(qNum, choice) {
+            if (isSubmitted) unlockForEditing();
+
+            userAnswers[qNum] = choice;
+
+            // تحديث شكل الكلمة بالحرفين المختارين
+            const displayEl = document.getElementById(`wordDisplay-${qNum}`);
+            if (displayEl && wordTemplates[qNum]) {
+                displayEl.innerHTML = wordTemplates[qNum][choice];
+            }
+
+            // تحديث حالة الأزرار
+            const options = qNum <= 8 ? ['i_e', 'ie'] : ['ai', 'ay'];
+            options.forEach(opt => {
+                const btn = document.getElementById(`pill-${qNum}-${opt}`);
+                if (!btn) return;
+                btn.classList.remove('selected-pill', 'correct-pill', 'wrong-pill');
+                if (opt === choice) {
+                    btn.classList.add('selected-pill');
+                }
+            });
+
+            updateNavigationPanel();
+        }
+
+        // ==========================================
+        // 3. دوال السؤال الرابع: Find and color (تلوين الغيمات بالأزرق أو الأصفر)
+        // ==========================================
+        function setActiveBrush(color) {
+            activeBrushColor = color;
+            const blueBtn = document.getElementById('brush-blue');
+            const yellowBtn = document.getElementById('brush-yellow');
+            if (color === 'blue') {
+                blueBtn.classList.add('active-brush');
+                yellowBtn.classList.remove('active-brush');
+            } else {
+                yellowBtn.classList.add('active-brush');
+                blueBtn.classList.remove('active-brush');
+            }
+        }
+
+        function paintCloud(qNum) {
+            paintCloudDirect(qNum, activeBrushColor);
+        }
+
+        function paintCloudDirect(qNum, color) {
+            if (isSubmitted) unlockForEditing();
+
+            userAnswers[qNum] = color;
+            const cloudWrap = document.getElementById(`cloudWrap-${qNum}`);
+            if (cloudWrap) {
+                cloudWrap.classList.remove('cloud-blue', 'cloud-yellow', 'cloud-correct', 'cloud-wrong');
+                cloudWrap.classList.add(color === 'blue' ? 'cloud-blue' : 'cloud-yellow');
+            }
+            updateNavigationPanel();
+        }
+
+        // ==========================================
+        // 4. تحديث لوحة الأسئلة الجانبية والتنقل السلس
+        // ==========================================
+        function updateNavigationPanel() {
+            let answeredCount = 0;
+
+            for (let i = 1; i <= 16; i++) {
+                const dot = document.getElementById(`navDot-${i}`);
+                const btn = document.getElementById(`navBtn-${i}`);
+
+                if (userAnswers[i]) {
+                    answeredCount++;
+                    if (!isSubmitted) {
+                        dot.className = "w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center en-font";
+                        dot.textContent = i;
+                        btn.className = "py-1.5 rounded-xl border-2 border-indigo-400 bg-indigo-50/50 flex items-center justify-center font-extrabold text-xs transition";
+                    }
+                } else {
+                    dot.className = "w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center en-font";
+                    dot.textContent = i;
+                    btn.className = "py-1.5 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-center font-extrabold text-xs transition";
+                }
+            }
+
+            document.getElementById('progressBadge').textContent = `${answeredCount} / 16 مجاب`;
+        }
+
+        function scrollToQuestion(qNum) {
+            const target = document.getElementById(`qRow-${qNum}`);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.classList.add('ring-4', 'ring-indigo-300');
+                setTimeout(() => target.classList.remove('ring-4', 'ring-indigo-300'), 1200);
+            }
+        }
+
+        // ==========================================
+        // 5. تصحيح الاختبار وتحديد المستوى وإصدار التقرير
+        // ==========================================
+        function evaluateQuiz() {
+            isSubmitted = true;
+            let rawScore = 0;
+
+            for (let i = 1; i <= 16; i++) {
+                const isCorrect = isQuestionCorrect(i);
+                if (isCorrect) rawScore++;
+
+                // تحديث أزرار لوحة الأسئلة
+                const dot = document.getElementById(`navDot-${i}`);
+                const btn = document.getElementById(`navBtn-${i}`);
+                if (isCorrect) {
+                    dot.className = "w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center en-font";
+                    dot.textContent = "✓";
+                    btn.className = "py-1.5 rounded-xl border-2 border-emerald-400 bg-emerald-50 flex items-center justify-center font-extrabold text-xs";
+                } else {
+                    dot.className = "w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center en-font";
+                    dot.textContent = "✗";
+                    btn.className = "py-1.5 rounded-xl border-2 border-rose-300 bg-rose-50 flex items-center justify-center font-extrabold text-xs";
+                }
+
+                // إظهار شارات التصحيح لكل سؤال
+                const badge = document.getElementById(`badge-${i}`);
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    if (isCorrect) {
+                        badge.className = "text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 inline-block mt-1";
+                        badge.textContent = "✓ صحيح";
+                    } else {
+                        let label = correctAnswers[i];
+                        if (i === 13 || i === 14) label = "أصفر (ai/ay)";
+                        if (i === 15 || i === 16) label = "أزرق (ee/ea)";
+                        badge.className = "text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 inline-block mt-1";
+                        badge.textContent = `✗ الصواب: ${label}`;
+                    }
+                }
+
+                // تلوين خانات السلة في السؤال 1
+                if (i >= 1 && i <= 4) {
+                    const slotEl = document.getElementById(`slot-${i}`);
+                    slotEl.classList.remove('correct-slot', 'wrong-slot');
+                    slotEl.classList.add(isCorrect ? 'correct-slot' : 'wrong-slot');
+                }
+
+                // تلوين أزرار الحرفين الناقصين في السؤالين 2 و 3
+                if (i >= 5 && i <= 12 && userAnswers[i]) {
+                    const chosenBtn = document.getElementById(`pill-${i}-${userAnswers[i]}`);
+                    if (chosenBtn) {
+                        chosenBtn.classList.remove('selected-pill');
+                        chosenBtn.classList.add(isCorrect ? 'correct-pill' : 'wrong-pill');
+                    }
+                }
+
+                // تلوين الغيمات في السؤال 4
+                if (i >= 13 && i <= 16) {
+                    const cloudWrap = document.getElementById(`cloudWrap-${i}`);
+                    if (cloudWrap) {
+                        cloudWrap.classList.remove('cloud-correct', 'cloud-wrong');
+                        cloudWrap.classList.add(isCorrect ? 'cloud-correct' : 'cloud-wrong');
+                    }
+                }
+            }
+
+            // حساب الدرجة من 12 للترويسة كما في ورقة العمل
+            const scoreOutOf12 = Math.round((rawScore / 16) * 12 * 10) / 10;
+            document.getElementById('headerScore').textContent = scoreOutOf12;
+
+            // حساب درجات كل قسم للتقرير التفصيلي
+            const sec1Score = [1, 2, 3, 4].filter(n => isQuestionCorrect(n)).length;
+            const sec2Score = [5, 6, 7, 8].filter(n => isQuestionCorrect(n)).length;
+            const sec3Score = [9, 10, 11, 12].filter(n => isQuestionCorrect(n)).length;
+            const sec4Score = [13, 14, 15, 16].filter(n => isQuestionCorrect(n)).length;
+
+            // تحديد المستوى العام للطالب
+            let levelInfo = {};
+            if (rawScore >= 13) {
+                levelInfo = {
+                    emoji: "🏆",
+                    title: "مستوى متقدم (ممتاز)",
+                    desc: "أتقن الطالب التمييز بين المقاطع الصوتية الطويلة (ee, ea, i_e, ie, ai, ay) بتميز!",
+                    recommendation: "الطالب متمكن من مهارات الـ Phonics في هذه الوحدة ومستعد للانتقال للوحدة التالية بثقة.",
+                    boxClass: "bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-4 text-center shadow-md",
+                    badgeBoxClass: "bg-emerald-50 p-4 rounded-2xl border border-emerald-300",
+                    badgeTextClass: "text-lg font-extrabold text-emerald-800 mt-1"
+                };
+            } else if (rawScore >= 9) {
+                levelInfo = {
+                    emoji: "⭐",
+                    title: "مستوى متوسط (جيد جداً)",
+                    desc: "أداء جيد جداً! يميز الطالب معظم المقاطع الصوتية مع حاجته لمراجعة بعض الكلمات المتشابهة.",
+                    recommendation: "يُنصح بالاستماع لنطق الكلمات ومراجعة الفرق الإملائي بين (ee / ea) و (ai / ay).",
+                    boxClass: "bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-2xl p-4 text-center shadow-md",
+                    badgeBoxClass: "bg-amber-50 p-4 rounded-2xl border border-amber-300",
+                    badgeTextClass: "text-lg font-extrabold text-amber-800 mt-1"
+                };
+            } else {
+                levelInfo = {
+                    emoji: "🌱",
+                    title: "مستوى مبتدئ (يحتاج لدعم)",
+                    desc: "يحتاج الطالب إلى تدريب إضافي للربط بين الصوت وشكل الحرفين الناقصين في الكلمات.",
+                    recommendation: "يُنصح بالضغط على أيقونات الصوت 🔊 أعلى الورقة وبجانب كل صورة وتكرار المحاولة.",
+                    boxClass: "bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-2xl p-4 text-center shadow-md",
+                    badgeBoxClass: "bg-rose-50 p-4 rounded-2xl border border-rose-300",
+                    badgeTextClass: "text-lg font-extrabold text-rose-800 mt-1"
+                };
+            }
+
+            // تحديث صندوق المستوى في اللوحة الجانبية
+            const liveLevelBox = document.getElementById('liveLevelBox');
+            liveLevelBox.className = levelInfo.boxClass;
+            document.getElementById('levelEmoji').textContent = levelInfo.emoji;
+            document.getElementById('levelTitle').className = "font-extrabold text-white text-base";
+            document.getElementById('levelTitle').textContent = levelInfo.title;
+            document.getElementById('levelDesc').className = "text-xs text-white/90 mt-1";
+            document.getElementById('levelDesc').textContent = levelInfo.desc;
+
+            // تعبئة بطاقة التقرير للطباعة
+            const studentName = document.getElementById('studentName').value.trim();
+            document.getElementById('reportStudentName').textContent = studentName || "طالب متميز";
+            document.getElementById('reportFinalScore').textContent = `${scoreOutOf12} / 12`;
+            document.getElementById('reportRawScore').textContent = `${rawScore} من 16 فقرة صحيحة`;
+
+            const reportLevelBadgeBox = document.getElementById('reportLevelBadgeBox');
+            reportLevelBadgeBox.className = levelInfo.badgeBoxClass;
+            const reportFinalLevel = document.getElementById('reportFinalLevel');
+            reportFinalLevel.className = levelInfo.badgeTextClass;
+            reportFinalLevel.textContent = `${levelInfo.emoji} ${levelInfo.title}`;
+            document.getElementById('reportRecommendation').textContent = levelInfo.recommendation;
+
+            const today = new Date();
+            document.getElementById('reportDate').textContent = `تاريخ التقييم: ${today.toLocaleDateString('ar-SA')}`;
+
+            const sectionsSummary = [
+                { title: "السؤال 1: تصنيف الكلمات في السلال (ee / ea)", score: sec1Score, max: 4 },
+                { title: "السؤال 2: إكمال الحرفين الناقصين (i_e / ie)", score: sec2Score, max: 4 },
+                { title: "السؤال 3: اختيار الحرفين الناقصين (ai / ay)", score: sec3Score, max: 4 },
+                { title: "السؤال 4: تلوين الكلمات بالأزرق والأصفر", score: sec4Score, max: 4 }
+            ];
+
+            const breakdownContainer = document.getElementById('skillsBreakdown');
+            breakdownContainer.innerHTML = '';
+            sectionsSummary.forEach(sec => {
+                const isFull = sec.score === sec.max;
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border flex items-center justify-between ${isFull ? 'bg-emerald-50/70 border-emerald-200' : 'bg-amber-50/70 border-amber-200'}`;
+                card.innerHTML = `
+                    <span class="font-extrabold text-xs sm:text-sm text-slate-800">${sec.title}</span>
+                    <span class="en-font font-black text-sm px-2.5 py-1 rounded-xl ${isFull ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'}">${sec.score} / ${sec.max}</span>
+                `;
+                breakdownContainer.appendChild(card);
+            });
+
+            const reportCard = document.getElementById('resultReportCard');
+            reportCard.classList.remove('hidden');
+            reportCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function unlockForEditing() {
+            isSubmitted = false;
+            for (let i = 1; i <= 16; i++) {
+                const badge = document.getElementById(`badge-${i}`);
+                if (badge) badge.classList.add('hidden');
+                const dot = document.getElementById(`navDot-${i}`);
+                if (dot) dot.textContent = i;
+            }
+            [1, 2, 3, 4].forEach(s => {
+                document.getElementById(`slot-${s}`).classList.remove('correct-slot', 'wrong-slot');
+            });
+            for (let i = 5; i <= 12; i++) {
+                const opts = i <= 8 ? ['i_e', 'ie'] : ['ai', 'ay'];
+                opts.forEach(opt => {
+                    const btn = document.getElementById(`pill-${i}-${opt}`);
+                    if (btn) {
+                        btn.classList.remove('correct-pill', 'wrong-pill');
+                        if (userAnswers[i] === opt) btn.classList.add('selected-pill');
+                    }
+                });
+            }
+            [13, 14, 15, 16].forEach(i => {
+                const cloudWrap = document.getElementById(`cloudWrap-${i}`);
+                if (cloudWrap) cloudWrap.classList.remove('cloud-correct', 'cloud-wrong');
+            });
+        }
+
+        function printStudentResult() {
+            if (!isSubmitted) {
+                evaluateQuiz();
+            }
+            const studentName = document.getElementById('studentName').value.trim();
+            document.getElementById('reportStudentName').textContent = studentName || "غير محدد";
+            setTimeout(() => {
+                window.print();
+            }, 250);
+        }
+
+        function resetQuiz() {
+            for (let i = 1; i <= 16; i++) {
+                userAnswers[i] = null;
+                const badge = document.getElementById(`badge-${i}`);
+                if (badge) badge.classList.add('hidden');
+            }
+            isSubmitted = false;
+            clearSelectedWordChip();
+            refreshBasketSlotsUI();
+
+            for (let i = 5; i <= 12; i++) {
+                const displayEl = document.getElementById(`wordDisplay-${i}`);
+                if (displayEl && wordTemplates[i]) {
+                    displayEl.innerHTML = wordTemplates[i].defaultHtml;
+                }
+                const opts = i <= 8 ? ['i_e', 'ie'] : ['ai', 'ay'];
+                opts.forEach(opt => {
+                    const btn = document.getElementById(`pill-${i}-${opt}`);
+                    if (btn) btn.classList.remove('selected-pill', 'correct-pill', 'wrong-pill');
+                });
+            }
+
+            [13, 14, 15, 16].forEach(i => {
+                const cloudWrap = document.getElementById(`cloudWrap-${i}`);
+                if (cloudWrap) {
+                    cloudWrap.classList.remove('cloud-blue', 'cloud-yellow', 'cloud-correct', 'cloud-wrong');
+                }
+            });
+
+            document.getElementById('headerScore').textContent = "--";
+            document.getElementById('resultReportCard').classList.add('hidden');
+
+            updateNavigationPanel();
+
+            document.getElementById('liveLevelBox').className = "bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-4 text-center border border-slate-200";
+            document.getElementById('levelEmoji').textContent = "📊";
+            document.getElementById('levelTitle').className = "font-extrabold text-slate-800 text-base";
+            document.getElementById('levelTitle').textContent = "بانتظار إكمال الاختبار";
+            document.getElementById('levelDesc').className = "text-xs text-slate-600 mt-1";
+            document.getElementById('levelDesc').textContent = "أجب عن الأقسام الأربعة ثم اضغط على اعتماد النتيجة لتحديد المستوى.";
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        document.getElementById('studentName').addEventListener('input', function(e) {
+            document.getElementById('reportStudentName').textContent = e.target.value.trim() || "غير محدد";
+        });
+    </script>
+</body>
+</html>
